@@ -10,5 +10,10 @@
         android:name="com.example.dadm.ui.home.HomeFragment"
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_home" />
+    <fragment
+        android:id="@+id/nav_reto3"
+        android:name="com.example.dadm.ui.triqui.TriquiFragment"
+        android:label="@string/menu_triqui"
+        tools:layout="@layout/fragment_triqui" />
 
 </navigation>

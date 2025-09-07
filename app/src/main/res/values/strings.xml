@@ -8,6 +8,16 @@
     <string name="action_settings">Settings</string>
 
     <string name="menu_home">Reto 0</string>
-    <string name="menu_gallery">Gallery</string>
-    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_triqui">Reto 3</string>
+
+    <string name="first_human">¡Juega!</string>
+    <string name="turn_human">Tu turno.</string>
+    <string name="turn_computer">Turno de Android.</string>
+    <string name="result_tie">¡Empate!</string>
+    <string name="result_human_wins">¡Ganaste!</string>
+    <string name="result_computer_wins">Android won!</string>
+    <string name="new_game">Nuevo juego</string>
+    <string name="score_human">Human0: 0</string>
+    <string name="score_tie">Empate: 0</string>
+    <string name="score_ia">Android: 0</string>
 </resources>
