@@ -6,15 +6,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.example.dadm.R
 
 class TriquiFragment : Fragment() {
+
     private lateinit var mGame: TicTacToeGame
     private lateinit var mBoardButtons: Array<Button>
     private lateinit var mInfoTextView: TextView
-    private var mGameOver = false
 
+    private var mGameOver = false
     private var humanWins = 0
     private var androidWins = 0
     private var ties = 0
@@ -25,10 +28,14 @@ class TriquiFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.fragment_triqui, container, false)
+
+        // Botón de nuevo juego
         val btnReset = root.findViewById<Button>(R.id.btnReset)
-        btnReset.setOnClickListener {
-            startNewGame()
-        }
+        btnReset.setOnClickListener { startNewGame() }
+
+        // Botón de dificultad
+        val btnDifficulty = root.findViewById<Button>(R.id.btnDifficulty)
+        btnDifficulty.setOnClickListener { showDifficultyDialog() }
 
         mBoardButtons = arrayOf(
             root.findViewById(R.id.btn1),
@@ -44,15 +51,22 @@ class TriquiFragment : Fragment() {
         mInfoTextView = root.findViewById(R.id.information)
         mGame = TicTacToeGame()
 
-        startNewGame()
+        // ¡Inicializa correctamente los textos de puntaje desde el inicio!
+        root.findViewById<TextView>(R.id.human_score).text = getString(R.string.score_human, humanWins)
+        root.findViewById<TextView>(R.id.ties_score).text = getString(R.string.score_tie, ties)
+        root.findViewById<TextView>(R.id.android_score).text = getString(R.string.score_ia, androidWins)
 
+        startNewGame()
         return root
     }
 
     private fun updateScores() {
-        view?.findViewById<TextView>(R.id.human_score)?.text = "Human: $humanWins"
-        view?.findViewById<TextView>(R.id.ties_score)?.text = "Ties: $ties"
-        view?.findViewById<TextView>(R.id.android_score)?.text = "Android: $androidWins"
+        view?.findViewById<TextView>(R.id.human_score)?.text =
+            getString(R.string.score_human, humanWins)
+        view?.findViewById<TextView>(R.id.ties_score)?.text =
+            getString(R.string.score_tie, ties)
+        view?.findViewById<TextView>(R.id.android_score)?.text =
+            getString(R.string.score_ia, androidWins)
     }
 
     private fun startNewGame() {
@@ -63,7 +77,6 @@ class TriquiFragment : Fragment() {
             btn.isEnabled = true
             btn.setOnClickListener { onHumanMove(i) }
         }
-
         if (humanStarts) {
             mInfoTextView.text = getString(R.string.first_human)
         } else {
@@ -80,7 +93,7 @@ class TriquiFragment : Fragment() {
             setMove(TicTacToeGame.HUMAN_PLAYER, location)
             var winner = mGame.checkForWinner()
             if (winner == 0) {
-                mInfoTextView.text = "@string/turn_computer"
+                mInfoTextView.text = getString(R.string.turn_computer)
                 val move = mGame.getComputerMove()
                 setMove(TicTacToeGame.COMPUTER_PLAYER, move)
                 winner = mGame.checkForWinner()
@@ -121,5 +134,27 @@ class TriquiFragment : Fragment() {
             }
         }
         updateScores()
+    }
+
+    private fun showDifficultyDialog() {
+        val levels = arrayOf(
+            getString(R.string.difficulty_easy),
+            getString(R.string.difficulty_harder),
+            getString(R.string.difficulty_expert)
+        )
+        val selected = mGame.getDifficultyLevel().ordinal
+        AlertDialog.Builder(requireContext())
+            .setTitle(getString(R.string.difficulty_choose))
+            .setSingleChoiceItems(levels, selected) { dialog, which ->
+                mGame.setDifficultyLevel(TicTacToeGame.DifficultyLevel.values()[which])
+                dialog.dismiss()
+                Toast.makeText(
+                    context,
+                    getString(R.string.difficulty_changed, levels[which]),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            .create()
+            .show()
     }
 }

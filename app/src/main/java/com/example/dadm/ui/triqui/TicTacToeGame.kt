@@ -1,6 +1,7 @@
 package com.example.dadm.ui.triqui
 
 class TicTacToeGame {
+
     companion object {
         const val HUMAN_PLAYER = 'X'
         const val COMPUTER_PLAYER = 'O'
@@ -8,8 +9,15 @@ class TicTacToeGame {
         const val BOARD_SIZE = 9
     }
 
+    // ENUM de dificultad
+    enum class DifficultyLevel { Easy, Harder, Expert }
+
     private val board = CharArray(BOARD_SIZE) { OPEN_SPOT }
-    private val rand = java.util.Random()
+    private var mDifficultyLevel = DifficultyLevel.Expert
+
+    // Getters y setters de dificultad
+    fun getDifficultyLevel(): DifficultyLevel = mDifficultyLevel
+    fun setDifficultyLevel(level: DifficultyLevel) { mDifficultyLevel = level }
 
     fun clearBoard() {
         for (i in board.indices) board[i] = OPEN_SPOT
@@ -20,6 +28,20 @@ class TicTacToeGame {
     }
 
     fun getComputerMove(): Int {
+        return when (mDifficultyLevel) {
+            DifficultyLevel.Easy -> getRandomMove()
+            DifficultyLevel.Harder -> getWinningMove() ?: getRandomMove()
+            DifficultyLevel.Expert -> getWinningMove() ?: getBlockingMove() ?: getRandomMove()
+        }
+    }
+
+    // Easy: Siempre aleatorio
+    private fun getRandomMove(): Int {
+        val available = board.indices.filter { board[it] == OPEN_SPOT }
+        return if (available.isNotEmpty()) available.random() else 0
+    }
+    // Harder y Expert: Busca ganar si puede
+    private fun getWinningMove(): Int? {
         for (i in board.indices) {
             if (board[i] == OPEN_SPOT) {
                 board[i] = COMPUTER_PLAYER
@@ -30,6 +52,10 @@ class TicTacToeGame {
                 board[i] = OPEN_SPOT
             }
         }
+        return null
+    }
+    // Expert: Bloquear al humano si está a punto de ganar
+    private fun getBlockingMove(): Int? {
         for (i in board.indices) {
             if (board[i] == OPEN_SPOT) {
                 board[i] = HUMAN_PLAYER
@@ -40,13 +66,10 @@ class TicTacToeGame {
                 board[i] = OPEN_SPOT
             }
         }
-        var move: Int
-        do {
-            move = rand.nextInt(BOARD_SIZE)
-        } while (board[move] != OPEN_SPOT)
-        return move
+        return null
     }
 
+    // 0 = nadie, 1 = empate, 2 = humano, 3 = computadora
     fun checkForWinner(): Int {
         val winCombos = arrayOf(
             intArrayOf(0, 1, 2), intArrayOf(3, 4, 5), intArrayOf(6, 7, 8),

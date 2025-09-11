@@ -95,12 +95,24 @@
             android:textSize="22sp"
             android:layout_marginTop="30dp"/>
 
-        <Button
-            android:id="@+id/btnReset"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/new_game"
-            android:layout_marginTop="20dp"/>
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal"
+            android:gravity="center">
+            <Button
+                android:id="@+id/btnReset"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/new_game" />
+            <Button
+                android:id="@+id/btnDifficulty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/menu_difficulty"
+                android:layout_marginStart="16dp" />
+        </LinearLayout>
 
         <RelativeLayout
             android:id="@+id/scoreLayout"

@@ -8,16 +8,31 @@
     <string name="action_settings">Settings</string>
 
     <string name="menu_home">Reto 0</string>
-    <string name="menu_triqui">Reto 3</string>
+    <string name="menu_triqui">Reto 3 &amp; 4</string>
+
+    <string name="credits">Créditos</string>
+    <string name="credits_text">Creado por María José Jara Herrera</string>
+
+    <string name="exit">Salir</string>
+    <string name="exit_title">¿Seguro que desea salir de la aplicación?</string>
+    <string name="yes">Sí</string>
+    <string name="no">No</string>
+
+    <string name="menu_difficulty">Dificultad</string>
+    <string name="difficulty_easy">Fácil</string>
+    <string name="difficulty_harder">Media</string>
+    <string name="difficulty_expert">Experto</string>
+    <string name="difficulty_choose">Elige la dificultad</string>
+    <string name="difficulty_changed">¡Dificultad cambiada a %1$s!</string>
 
     <string name="first_human">¡Juega!</string>
     <string name="turn_human">Tu turno.</string>
     <string name="turn_computer">Turno de Android.</string>
     <string name="result_tie">¡Empate!</string>
     <string name="result_human_wins">¡Ganaste!</string>
-    <string name="result_computer_wins">Android won!</string>
+    <string name="result_computer_wins">Android ganó!</string>
     <string name="new_game">Nuevo juego</string>
-    <string name="score_human">Human0: 0</string>
-    <string name="score_tie">Empate: 0</string>
-    <string name="score_ia">Android: 0</string>
+    <string name="score_human">Humano: %1$d</string>
+    <string name="score_tie">Empate: %1$d</string>
+    <string name="score_ia">Android: %1$d</string>
 </resources>
