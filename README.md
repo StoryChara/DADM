@@ -1,4 +1,4 @@
-# DADM — Desarrollo de Aplicaciones para Dispositivos Móviles
+# Desarrollo de Aplicaciones para Dispositivos Móviles
 
 [Repositorio en GitHub](https://github.com/StoryChara/DADM)
 
@@ -51,3 +51,4 @@ El código fuente se encuentra bajo la carpeta principal `app/`. Allí encontrar
 ## 🚀 Créditos
 
 Desarrollado por **María José Jara Herrera** para la asignatura de DADM — 2025.
+
