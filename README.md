@@ -1,6 +1,6 @@
 # Desarrollo de Aplicaciones para Dispositivos Móviles
 
-[Repositorio en GitHub](https://github.com/StoryChara/DADM) [Realeses de la Aplicación](https://github.com/StoryChara/DADM/releases)
+[Repositorio en GitHub](https://github.com/StoryChara/DADM) [Releases de la Aplicación](https://github.com/StoryChara/DADM/releases)
 
 Este repositorio recopila los retos, ejemplos y recursos desarrollados como apoyo para la asignatura de **Desarrollo de Aplicaciones para Dispositivos Móviles** (DADM). El código está organizado en módulos temáticos (paquetes), totalmente en **Kotlin**.
 
@@ -51,5 +51,6 @@ El código fuente se encuentra bajo la carpeta principal `app/`. Allí encontrar
 ## 🚀 Créditos
 
 Desarrollado por **María José Jara Herrera** para la asignatura de DADM — 2025.
+
 
 
