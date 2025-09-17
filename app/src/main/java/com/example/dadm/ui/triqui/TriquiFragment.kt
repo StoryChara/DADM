@@ -1,7 +1,11 @@
 package com.example.dadm.ui.triqui
 
+import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -14,7 +18,7 @@ import com.example.dadm.R
 class TriquiFragment : Fragment() {
 
     private lateinit var mGame: TicTacToeGame
-    private lateinit var mBoardButtons: Array<Button>
+    private lateinit var mBoardView: BoardView
     private lateinit var mInfoTextView: TextView
 
     private var mGameOver = false
@@ -23,41 +27,60 @@ class TriquiFragment : Fragment() {
     private var ties = 0
     private var humanStarts = true
 
+    // Sonidos
+    private var humanMediaPlayer: MediaPlayer? = null
+    private var computerMediaPlayer: MediaPlayer? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.fragment_triqui, container, false)
 
-        // Botón de nuevo juego
-        val btnReset = root.findViewById<Button>(R.id.btnReset)
-        btnReset.setOnClickListener { startNewGame() }
-
-        // Botón de dificultad
-        val btnDifficulty = root.findViewById<Button>(R.id.btnDifficulty)
-        btnDifficulty.setOnClickListener { showDifficultyDialog() }
-
-        mBoardButtons = arrayOf(
-            root.findViewById(R.id.btn1),
-            root.findViewById(R.id.btn2),
-            root.findViewById(R.id.btn3),
-            root.findViewById(R.id.btn4),
-            root.findViewById(R.id.btn5),
-            root.findViewById(R.id.btn6),
-            root.findViewById(R.id.btn7),
-            root.findViewById(R.id.btn8),
-            root.findViewById(R.id.btn9)
-        )
-        mInfoTextView = root.findViewById(R.id.information)
         mGame = TicTacToeGame()
 
-        // ¡Inicializa correctamente los textos de puntaje desde el inicio!
+        mBoardView = root.findViewById(R.id.board)
+        mBoardView.setGame(mGame)
+        mInfoTextView = root.findViewById(R.id.information)
+
+        // Inicializa el marcador
         root.findViewById<TextView>(R.id.human_score).text = getString(R.string.score_human, humanWins)
         root.findViewById<TextView>(R.id.ties_score).text = getString(R.string.score_tie, ties)
         root.findViewById<TextView>(R.id.android_score).text = getString(R.string.score_ia, androidWins)
 
+        // Botones
+        root.findViewById<Button>(R.id.btnReset).setOnClickListener { startNewGame() }
+        root.findViewById<Button>(R.id.btnDifficulty).setOnClickListener { showDifficultyDialog() }
+
+        // Listener de toques sobre el tablero
+        mBoardView.setOnTouchListener { _, event ->
+            if (!mGameOver && event.action == MotionEvent.ACTION_DOWN) {
+                val col = (event.x / mBoardView.getBoardCellWidth()).toInt()
+                val row = (event.y / mBoardView.getBoardCellHeight()).toInt()
+                val pos = row * 3 + col
+
+                if (pos in 0..8 && mGame.getBoardOccupant(pos) == TicTacToeGame.OPEN_SPOT) {
+                    makeMove(TicTacToeGame.HUMAN_PLAYER, pos, isHuman = true)
+                }
+            }
+            true
+        }
+
         startNewGame()
         return root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Carga los sonidos (ajusta los nombres si tus archivos no son estos)
+        humanMediaPlayer = MediaPlayer.create(requireContext(), R.raw.move_human)
+        computerMediaPlayer = MediaPlayer.create(requireContext(), R.raw.move_computer)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        humanMediaPlayer?.release()
+        computerMediaPlayer?.release()
     }
 
     private fun updateScores() {
@@ -72,46 +95,41 @@ class TriquiFragment : Fragment() {
     private fun startNewGame() {
         mGame.clearBoard()
         mGameOver = false
-        for ((i, btn) in mBoardButtons.withIndex()) {
-            btn.text = ""
-            btn.isEnabled = true
-            btn.setOnClickListener { onHumanMove(i) }
-        }
+        mBoardView.invalidate() // Redibuja tablero
+
         if (humanStarts) {
             mInfoTextView.text = getString(R.string.first_human)
         } else {
             mInfoTextView.text = getString(R.string.turn_computer)
-            val move = mGame.getComputerMove()
-            setMove(TicTacToeGame.COMPUTER_PLAYER, move)
+            Handler(Looper.getMainLooper()).postDelayed({
+                val move = mGame.getComputerMove()
+                makeMove(TicTacToeGame.COMPUTER_PLAYER, move, isHuman = false)
+            }, 500)
         }
         humanStarts = !humanStarts
         updateScores()
     }
 
-    private fun onHumanMove(location: Int) {
-        if (!mGameOver && mBoardButtons[location].isEnabled) {
-            setMove(TicTacToeGame.HUMAN_PLAYER, location)
-            var winner = mGame.checkForWinner()
-            if (winner == 0) {
-                mInfoTextView.text = getString(R.string.turn_computer)
+    // Lógica para hacer un movimiento (humano o computadora)
+    private fun makeMove(player: Char, pos: Int, isHuman: Boolean) {
+        mGame.setMove(player, pos)
+        mBoardView.invalidate()
+        if (isHuman) {
+            humanMediaPlayer?.start()
+        } else {
+            computerMediaPlayer?.start()
+        }
+        val winner = mGame.checkForWinner()
+        if (winner == 0 && isHuman) {
+            mInfoTextView.text = getString(R.string.turn_computer)
+            // Delay antes de movimiento de la computadora
+            Handler(Looper.getMainLooper()).postDelayed({
                 val move = mGame.getComputerMove()
-                setMove(TicTacToeGame.COMPUTER_PLAYER, move)
-                winner = mGame.checkForWinner()
-            }
+                makeMove(TicTacToeGame.COMPUTER_PLAYER, move, isHuman = false)
+            }, 1000)
+        } else {
             updateStatus(winner)
         }
-    }
-
-    private fun setMove(player: Char, location: Int) {
-        mGame.setMove(player, location)
-        mBoardButtons[location].isEnabled = false
-        mBoardButtons[location].text = player.toString()
-        mBoardButtons[location].setTextColor(
-            if (player == TicTacToeGame.HUMAN_PLAYER)
-                resources.getColor(android.R.color.holo_green_dark)
-            else
-                resources.getColor(android.R.color.holo_red_dark)
-        )
     }
 
     private fun updateStatus(winner: Int) {

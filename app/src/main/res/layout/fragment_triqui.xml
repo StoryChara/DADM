@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:id="@+id/layoutPrincipal"
@@ -13,79 +14,17 @@
         android:layout_margin="16dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <TableLayout
-            android:id="@+id/play_grid"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp">
+        <!-- Tablero como Custom View -->
+        <com.example.dadm.ui.triqui.BoardView
+            android:id="@+id/board"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_marginTop="20dp" />
 
-            <TableRow>
-
-                <Button
-                    android:id="@+id/btn1"
-                    android:layout_margin="6dp"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp" />
-
-                <Button
-                    android:id="@+id/btn2"
-                    android:layout_margin="6dp"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp" />
-
-                <Button
-                    android:id="@+id/btn3"
-                    android:layout_margin="6dp"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"/>
-            </TableRow>
-            <TableRow>
-
-                <Button
-                    android:id="@+id/btn4"
-                    android:layout_margin="6dp"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp" />
-
-                <Button
-                    android:id="@+id/btn5"
-                    android:layout_margin="6dp"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp" />
-
-                <Button
-                    android:id="@+id/btn6"
-                    android:layout_margin="6dp"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"/>
-            </TableRow>
-            <TableRow>
-
-                <Button
-                    android:id="@+id/btn7"
-                    android:layout_margin="6dp"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp" />
-
-                <Button
-                    android:id="@+id/btn8"
-                    android:layout_margin="6dp"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp" />
-
-                <Button
-                    android:id="@+id/btn9"
-                    android:layout_margin="6dp"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"/>
-            </TableRow>
-        </TableLayout>
-
+        <!-- Status del juego -->
         <TextView
             android:id="@+id/information"
             android:layout_width="wrap_content"
@@ -93,27 +32,33 @@
             android:gravity="center_horizontal"
             android:text="@string/first_human"
             android:textSize="22sp"
+            android:textStyle="bold"
             android:layout_marginTop="30dp"/>
 
+        <!-- Botones para nuevo juego y dificultad -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:orientation="horizontal"
             android:gravity="center">
+
             <Button
                 android:id="@+id/btnReset"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/new_game" />
+
             <Button
                 android:id="@+id/btnDifficulty"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/menu_difficulty"
                 android:layout_marginStart="16dp" />
+
         </LinearLayout>
 
+        <!-- Marcador de partidas -->
         <RelativeLayout
             android:id="@+id/scoreLayout"
             android:layout_width="wrap_content"
@@ -127,7 +72,8 @@
                 android:layout_height="wrap_content"
                 android:text="@string/score_human"
                 android:textSize="18sp"
-                android:layout_alignParentStart="true"/>
+                android:layout_alignParentStart="true"
+                android:textStyle="bold"/>
 
             <TextView
                 android:id="@+id/ties_score"
@@ -136,7 +82,8 @@
                 android:text="@string/score_tie"
                 android:textSize="18sp"
                 android:layout_toEndOf="@+id/human_score"
-                android:layout_marginStart="24dp"/>
+                android:layout_marginStart="24dp"
+                android:textStyle="bold"/>
 
             <TextView
                 android:id="@+id/android_score"
@@ -145,8 +92,10 @@
                 android:text="@string/score_ia"
                 android:textSize="18sp"
                 android:layout_toEndOf="@+id/ties_score"
-                android:layout_marginStart="24dp"/>
+                android:layout_marginStart="24dp"
+                android:textStyle="bold"/>
         </RelativeLayout>
 
     </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -23,10 +23,22 @@ class TicTacToeGame {
         for (i in board.indices) board[i] = OPEN_SPOT
     }
 
+    /**
+     * Devuelve el valor de una celda (HUMAN_PLAYER, COMPUTER_PLAYER o OPEN_SPOT)
+     */
+    fun getBoardOccupant(position: Int): Char = board[position]
+
+    /**
+     * Intenta hacer un movimiento en la posición dada para el jugador.
+     * Solo coloca la ficha si la casilla está vacía.
+     */
     fun setMove(player: Char, location: Int) {
         if (board[location] == OPEN_SPOT) board[location] = player
     }
 
+    /**
+     * Obtiene el movimiento del computador según la dificultad actual.
+     */
     fun getComputerMove(): Int {
         return when (mDifficultyLevel) {
             DifficultyLevel.Easy -> getRandomMove()
@@ -40,6 +52,7 @@ class TicTacToeGame {
         val available = board.indices.filter { board[it] == OPEN_SPOT }
         return if (available.isNotEmpty()) available.random() else 0
     }
+
     // Harder y Expert: Busca ganar si puede
     private fun getWinningMove(): Int? {
         for (i in board.indices) {
@@ -54,6 +67,7 @@ class TicTacToeGame {
         }
         return null
     }
+
     // Expert: Bloquear al humano si está a punto de ganar
     private fun getBlockingMove(): Int? {
         for (i in board.indices) {
@@ -69,7 +83,9 @@ class TicTacToeGame {
         return null
     }
 
-    // 0 = nadie, 1 = empate, 2 = humano, 3 = computadora
+    /**
+     * 0 = nadie, 1 = empate, 2 = humano, 3 = computadora
+     */
     fun checkForWinner(): Int {
         val winCombos = arrayOf(
             intArrayOf(0, 1, 2), intArrayOf(3, 4, 5), intArrayOf(6, 7, 8),
