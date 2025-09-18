@@ -1,30 +1,44 @@
 # Paquete: `ui/triqui` — Juego de Triqui (Tic-Tac-Toe)
 
-Este paquete contiene todos los recursos relacionados con la implementación del reto de triqui (tic-tac-toe) para la materia de Desarrollo de Aplicaciones para Dispositivos Móviles (DADM). Aquí se encapsula la lógica, interfaz y recursos propios de esta pantalla de juego, siguiendo una arquitectura modular y buenas prácticas de Android.
+Este paquete contiene todos los recursos relacionados con la implementación completa y mejorada del reto de triqui (tic-tac-toe) para la materia de Desarrollo de Aplicaciones para Dispositivos Móviles (DADM). Abarca la lógica, la interfaz, la interacción táctil, los elementos visuales personalizados y los efectos de sonido, con estructura modular y buenas prácticas de Android.
+
+---
 
 ## Estructura de archivos principales
 
 - **TriquiFragment.kt**
   - Fragmento principal que administra el ciclo de vida de la UI del juego.
-  - Inicializa el tablero, gestiona el turno, la alternancia de primer jugador, controles de botón para reinicio y dificultad, y muestra el marcador.
+  - Inicializa el tablero gráfico (`BoardView`), maneja turnos, alterna el jugador inicial, botones para reinicio y dificultad, marcador y la integración sonora.
   - Despliega un `AlertDialog` para seleccionar la dificultad y actualiza la lógica del juego según la selección.
 
 - **TicTacToeGame.kt**
-  - Clase independiente con toda la lógica del juego.
-  - Gestiona el tablero, la IA con tres dificultades (`Easy`, `Harder`, `Expert`), chequeo de ganador y movimientos válidos.
-  - Sigue la recomendación de separación UI/lógica para máxima facilidad de pruebas y mantenimiento.
+  - Lógica independiente y desacoplada del juego.
+  - Gestiona el estado interno del tablero, IA con tres niveles de dificultad (`Easy`, `Harder`, `Expert`), checa ganador, movimientos válidos y expone el método `getBoardOccupant(i: Int)` para la vista gráfica.
+
+- **BoardView.kt**
+  - Custom View encargado de dibujar el tablero, pintar las fichas (`X` y `O`) usando imágenes (bitmaps), interpretar toques del usuario para jugar, y solicitar redibujos según el estado del juego.
+  - Integra el método `setGame()` para recibir el estado solo lectura del juego y métodos para calcular dimensiones de cada celda.
 
 - **fragment_triqui.xml**
-  - Layout visual de la pantalla, con:
-    - Un tablero de 9 botones (3x3) usando `TableLayout`.
-    - Un status de turno mediante `TextView`.
-    - Una fila horizontal para los botones de “Nuevo Juego” y “Dificultad”.
-    - Marcadores de victorias, empates y derrotas en una fila compacta y visualmente clara.
-  
+  - Layout visual del fragmento, contiene:
+    - El `BoardView` integrado como tablero central (reemplaza completamente al anterior TableLayout de botones).
+    - Un TextView para mostrar turno/status.
+    - Dos botones horizontales: “Nuevo Juego” y “Dificultad”.
+    - Un marcador alineado horizontalmente para victorias, empates y derrotas.
+
+- **/res/drawable/x_img.png & o_img.png**
+  - Imágenes de las fichas X y O, usadas por BoardView para mostrar los movimientos.
+
+- **/res/raw/move_human.mp3 & move_computer.mp3**
+  - Efectos de sonido personalizados para los movimientos del humano y de la computadora.
+
+---
+
 ## Funcionalidades principales
 
-- Alternancia de quién inicia la partida (humano o Android).
-- Selección y cambio de dificultad en vivo (fácil, media, experta) desde la UI con `AlertDialog`.
-- Estadísticas de victorias, empates y derrotas visibles y persistentes durante la sesión.
-- Reinicio de partida inmediato con botón dedicado.
-- Colores y textos accesibles, recursos centralizados en `strings.xml` para facilitar localización.
+- **Tablero gráfico interactivo:** El tablero de triqui es ahora completamente gráfico, con celdas y fichas dibujadas dinámicamente.
+- **Interacción táctil:** El usuario realiza sus movimientos tocando directamente la celda que desea jugar.
+- **Efectos de sonido integrados:** Se reproducen sonidos distintos para el turno humano y el de la IA, mejorando la experiencia y el feedback.
+- **Retraso en el turno de la IA:** Añade realismo y claridad, permitiendo ver los mensajes de “turno” en pantalla antes del movimiento del computador.
+- **Marcador y reinicio:** El marcador se actualiza en tiempo real y puedes reiniciar el juego en cualquier momento.
+- **Selector de dificultad:** Cambia la dificultad de la IA al instante desde la UI, usando un diálogo claro.
