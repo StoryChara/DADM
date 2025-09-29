@@ -9,10 +9,9 @@ class TicTacToeGame {
         const val BOARD_SIZE = 9
     }
 
-    // ENUM de dificultad
     enum class DifficultyLevel { Easy, Harder, Expert }
 
-    private val board = CharArray(BOARD_SIZE) { OPEN_SPOT }
+    private var board = CharArray(BOARD_SIZE) { OPEN_SPOT }
     private var mDifficultyLevel = DifficultyLevel.Expert
 
     // Getters y setters de dificultad
@@ -23,22 +22,24 @@ class TicTacToeGame {
         for (i in board.indices) board[i] = OPEN_SPOT
     }
 
-    /**
-     * Devuelve el valor de una celda (HUMAN_PLAYER, COMPUTER_PLAYER o OPEN_SPOT)
-     */
+    /** Devuelve el valor de una celda (HUMAN_PLAYER, COMPUTER_PLAYER o OPEN_SPOT) */
     fun getBoardOccupant(position: Int): Char = board[position]
 
-    /**
-     * Intenta hacer un movimiento en la posición dada para el jugador.
-     * Solo coloca la ficha si la casilla está vacía.
-     */
+    /** Devuelve una copia del estado actual del tablero (para guardar en Bundle/persistencia) */
+    fun getBoardState(): CharArray = board.clone()
+
+    /** Restaura el estado del tablero desde un CharArray (usado al restaurar instancia) */
+    fun setBoardState(newBoard: CharArray?) {
+        if (newBoard != null && newBoard.size == BOARD_SIZE)
+            board = newBoard.clone()
+    }
+
+    /** Intenta hacer un movimiento en la posición dada para el jugador. Solo si está vacía. */
     fun setMove(player: Char, location: Int) {
         if (board[location] == OPEN_SPOT) board[location] = player
     }
 
-    /**
-     * Obtiene el movimiento del computador según la dificultad actual.
-     */
+    /** Obtiene el movimiento del computador según la dificultad actual. */
     fun getComputerMove(): Int {
         return when (mDifficultyLevel) {
             DifficultyLevel.Easy -> getRandomMove()
@@ -83,9 +84,7 @@ class TicTacToeGame {
         return null
     }
 
-    /**
-     * 0 = nadie, 1 = empate, 2 = humano, 3 = computadora
-     */
+    /** 0 = nadie, 1 = empate, 2 = humano, 3 = computadora */
     fun checkForWinner(): Int {
         val winCombos = arrayOf(
             intArrayOf(0, 1, 2), intArrayOf(3, 4, 5), intArrayOf(6, 7, 8),

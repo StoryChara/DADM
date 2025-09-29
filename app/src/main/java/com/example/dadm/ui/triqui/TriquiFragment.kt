@@ -1,13 +1,12 @@
 package com.example.dadm.ui.triqui
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.LayoutInflater
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -27,7 +26,8 @@ class TriquiFragment : Fragment() {
     private var ties = 0
     private var humanStarts = true
 
-    // Sonidos
+    private lateinit var prefs: SharedPreferences
+
     private var humanMediaPlayer: MediaPlayer? = null
     private var computerMediaPlayer: MediaPlayer? = null
 
@@ -35,30 +35,47 @@ class TriquiFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        setHasOptionsMenu(true)
         val root = inflater.inflate(R.layout.fragment_triqui, container, false)
+        // Recupera los puntajes y dificultad de las preferencias
+        prefs = requireActivity().getSharedPreferences("ttt_prefs", Context.MODE_PRIVATE)
+        humanWins = prefs.getInt("humanWins", 0)
+        androidWins = prefs.getInt("androidWins", 0)
+        ties = prefs.getInt("ties", 0)
 
         mGame = TicTacToeGame()
+        val diffOrdinal = prefs.getInt("difficulty", TicTacToeGame.DifficultyLevel.Expert.ordinal)
+        mGame.setDifficultyLevel(TicTacToeGame.DifficultyLevel.values()[diffOrdinal])
 
         mBoardView = root.findViewById(R.id.board)
         mBoardView.setGame(mGame)
         mInfoTextView = root.findViewById(R.id.information)
 
-        // Inicializa el marcador
-        root.findViewById<TextView>(R.id.human_score).text = getString(R.string.score_human, humanWins)
-        root.findViewById<TextView>(R.id.ties_score).text = getString(R.string.score_tie, ties)
-        root.findViewById<TextView>(R.id.android_score).text = getString(R.string.score_ia, androidWins)
+        updateScores(root)
 
-        // Botones
         root.findViewById<Button>(R.id.btnReset).setOnClickListener { startNewGame() }
         root.findViewById<Button>(R.id.btnDifficulty).setOnClickListener { showDifficultyDialog() }
 
-        // Listener de toques sobre el tablero
+        // **BOTÓN RESET SCORES**
+        root.findViewById<Button>(R.id.btnResetScores).setOnClickListener {
+            humanWins = 0
+            androidWins = 0
+            ties = 0
+            prefs.edit()
+                .putInt("humanWins", 0)
+                .putInt("androidWins", 0)
+                .putInt("ties", 0)
+                .apply()
+            updateScores(root)
+            Toast.makeText(requireContext(), "Marcador reiniciado", Toast.LENGTH_SHORT).show()
+        }
+
+        // Touch
         mBoardView.setOnTouchListener { _, event ->
             if (!mGameOver && event.action == MotionEvent.ACTION_DOWN) {
                 val col = (event.x / mBoardView.getBoardCellWidth()).toInt()
                 val row = (event.y / mBoardView.getBoardCellHeight()).toInt()
                 val pos = row * 3 + col
-
                 if (pos in 0..8 && mGame.getBoardOccupant(pos) == TicTacToeGame.OPEN_SPOT) {
                     makeMove(TicTacToeGame.HUMAN_PLAYER, pos, isHuman = true)
                 }
@@ -66,13 +83,30 @@ class TriquiFragment : Fragment() {
             true
         }
 
-        startNewGame()
+        if (savedInstanceState == null) {
+            startNewGame()
+        } else {
+            mGame.setBoardState(savedInstanceState.getCharArray("board"))
+            mGameOver = savedInstanceState.getBoolean("mGameOver")
+            mInfoTextView.text = savedInstanceState.getCharSequence("info")
+            humanStarts = savedInstanceState.getBoolean("humanStarts", true)
+            mGame.setDifficultyLevel(
+                TicTacToeGame.DifficultyLevel.values()[savedInstanceState.getInt("difficulty", diffOrdinal)]
+            )
+            updateScores(root)
+            mBoardView.invalidate()
+            if (!mGameOver && mInfoTextView.text == getString(R.string.turn_computer)) {
+                Handler(Looper.getMainLooper()).postDelayed({
+                    val move = mGame.getComputerMove()
+                    makeMove(TicTacToeGame.COMPUTER_PLAYER, move, isHuman = false)
+                }, 500)
+            }
+        }
         return root
     }
 
     override fun onResume() {
         super.onResume()
-        // Carga los sonidos (ajusta los nombres si tus archivos no son estos)
         humanMediaPlayer = MediaPlayer.create(requireContext(), R.raw.move_human)
         computerMediaPlayer = MediaPlayer.create(requireContext(), R.raw.move_computer)
     }
@@ -81,22 +115,37 @@ class TriquiFragment : Fragment() {
         super.onPause()
         humanMediaPlayer?.release()
         computerMediaPlayer?.release()
+        // Guarda puntajes y dificultad
+        prefs.edit()
+            .putInt("humanWins", humanWins)
+            .putInt("androidWins", androidWins)
+            .putInt("ties", ties)
+            .putInt("difficulty", mGame.getDifficultyLevel().ordinal)
+            .apply()
     }
 
-    private fun updateScores() {
-        view?.findViewById<TextView>(R.id.human_score)?.text =
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putCharArray("board", mGame.getBoardState())
+        outState.putBoolean("mGameOver", mGameOver)
+        outState.putCharSequence("info", mInfoTextView.text)
+        outState.putBoolean("humanStarts", humanStarts)
+        outState.putInt("difficulty", mGame.getDifficultyLevel().ordinal)
+    }
+
+    private fun updateScores(root: View? = view) {
+        root?.findViewById<TextView>(R.id.human_score)?.text =
             getString(R.string.score_human, humanWins)
-        view?.findViewById<TextView>(R.id.ties_score)?.text =
+        root?.findViewById<TextView>(R.id.ties_score)?.text =
             getString(R.string.score_tie, ties)
-        view?.findViewById<TextView>(R.id.android_score)?.text =
+        root?.findViewById<TextView>(R.id.android_score)?.text =
             getString(R.string.score_ia, androidWins)
     }
 
     private fun startNewGame() {
         mGame.clearBoard()
         mGameOver = false
-        mBoardView.invalidate() // Redibuja tablero
-
+        mBoardView.invalidate()
         if (humanStarts) {
             mInfoTextView.text = getString(R.string.first_human)
         } else {
@@ -110,7 +159,6 @@ class TriquiFragment : Fragment() {
         updateScores()
     }
 
-    // Lógica para hacer un movimiento (humano o computadora)
     private fun makeMove(player: Char, pos: Int, isHuman: Boolean) {
         mGame.setMove(player, pos)
         mBoardView.invalidate()
@@ -122,7 +170,6 @@ class TriquiFragment : Fragment() {
         val winner = mGame.checkForWinner()
         if (winner == 0 && isHuman) {
             mInfoTextView.text = getString(R.string.turn_computer)
-            // Delay antes de movimiento de la computadora
             Handler(Looper.getMainLooper()).postDelayed({
                 val move = mGame.getComputerMove()
                 makeMove(TicTacToeGame.COMPUTER_PLAYER, move, isHuman = false)
@@ -165,6 +212,7 @@ class TriquiFragment : Fragment() {
             .setTitle(getString(R.string.difficulty_choose))
             .setSingleChoiceItems(levels, selected) { dialog, which ->
                 mGame.setDifficultyLevel(TicTacToeGame.DifficultyLevel.values()[which])
+                prefs.edit().putInt("difficulty", which).apply()
                 dialog.dismiss()
                 Toast.makeText(
                     context,
